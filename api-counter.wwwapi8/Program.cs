@@ -3,6 +3,9 @@ using api_counter.wwwapi8.Helpers;
 using api_counter.wwwapi8.Models;
 using Microsoft.AspNetCore.Mvc;
 
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -27,24 +30,30 @@ var counters = app.MapGroup("/counters");
 //TODO: 1. write a method that returns all counters in the counters list.  use method below as a starting point
 counters.MapGet("/", () =>
 {
-    return TypedResults.Ok();
+    return TypedResults.Ok(counters);
 });
 
 
 //TODO: 2. write a method to return a single counter based on the id being passed in.  complete method below
-counters.MapGet("/{id}", (int id) =>
-{    
+counters.MapGet("/", (int id) =>
+{
+    var counter = counters.FirstOrDefault(c => c.Id == id);
     return TypedResults.Ok(id);
 });
 
 //TODO: 3.  write another controlller method that returns counters that have a value greater than the {number} passed in.        
 counters.MapGet("/greaterthan/{number}", (int number) =>
 {
-    return TypedResults.Ok(number);
+    var counter = counters.Where(c => c.Value > number).ToList();
+    return TypedResults.Ok(counter);
 });
 
 ////TODO:4. write another controlller method that returns counters that have a value less than the {number} passed in.
-
+counters.MapGet("/lesserthan/{number}", (int number) =>
+{
+    var counter = counters.Where(c => c.Value > number).ToList();
+    return TypedResults.Ok(counter);
+});
 
 
 //Extension #1
@@ -52,6 +61,19 @@ counters.MapGet("/greaterthan/{number}", (int number) =>
 //e.g.  with an Id=1  the Books counter Value should be increased from 5 to 6
 //return the counter you have increased
 
+counters.MapGet("/{id}", (int id) =>
+{
+    var counter = counters.FirstOrDefault(c => c.Id == id);
+
+    if (counter! == null)
+    {
+        counter.Value++;
+    }
+
+
+
+    return TypedResults.Ok(counter);
+}); 
 
 //Extension #2
 //TODO: 2. Write a controller method that decrements the Value property of a counter of any given Id.
